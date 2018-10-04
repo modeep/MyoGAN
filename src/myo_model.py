@@ -4,7 +4,10 @@ from keras.models import Sequential, Model
 from keras.layers import Conv2D, Conv2DTranspose, Reshape, BatchNormalization, Dense, Activation, UpSampling2D, Input
 from keras.layers import Flatten
 from keras.layers.advanced_activations import LeakyReLU
-from .load_data import DataLoader_Continous
+from load_data import DataLoader_Continous
+from keras.models import model_from_json
+
+import matplotlib.pyplot as plt
 
 '''
 Model structure
@@ -37,13 +40,6 @@ Discriminator
 
 class MyoGAN:
     def __init__(self):
-        self.net_d = self.discriminative()
-        self.net_g = self.generative()
-        fake_image = self.net_g(self.noise_input)
-
-        combined_output = self.net_d(fake_image)
-        self.combined_model = Model(inputs=[self.noise_input], outputs=[combined_output], name='combined')
-
         self.g_loss_history = []
         self.d_loss_real_history = []
         self.d_loss_fake_history = []
@@ -63,8 +59,19 @@ class MyoGAN:
                                            emg_length=600,
                                            is_flatten=False)
 
+        self.net_d = self.discriminative()
+        self.net_g = self.generative()
+        fake_image = self.net_g(self.noise_input)
+
+        combined_output = self.net_d(fake_image)
+        self.combined_model = Model(inputs=[self.noise_input], outputs=[combined_output], name='combined')
+
     def generative(self):
-        _ = (Dense(256, input_shape=(100,), activation='relu'))
+        # TODO: Fix Error: Layer batch_normalization_6 was called with an input that isn't a symbolic tensor.
+        # Received type: <class 'keras.layers.core.Dense'>. Full input: [<keras.layers.core.Dense
+        # object at 0x00000238085AF0B8>]. All inputs to the layer should be tensors.
+
+        _ = Dense(256, input_shape=(100,), activation='relu')
         _ = BatchNormalization(axis=1)(_, training=1)
         _ = Reshape((16, 16, 1), input_shape=(256,))(_)
 
@@ -126,13 +133,58 @@ class MyoGAN:
 
         return Model(inputs=inputs, outputs=outputs)
 
+    def load_model(self):
+        json_file = open('./model_output/load_model/g_model.json', 'r')
+        loaded_model_json = json_file.read()
+        json_file.close()
+        load_g_model = model_from_json(loaded_model_json)
+        # load weights into new model
+        load_g_model.load_weights("./model_output/load_model/g_model.h5")
+
+        json_file = open('./model_output/load_model/d_model.json', 'r')
+        loaded_model_json = json_file.read()
+        json_file.close()
+        load_d_model = model_from_json(loaded_model_json)
+        # load weights into new model
+        load_d_model.load_weights("./model_output/load_model/d_model.h5")
+
+        json_file = open('./model_output/load_model/combined_model.json', 'r')
+        loaded_model_json = json_file.read()
+        json_file.close()
+        load_combined_model = model_from_json(loaded_model_json)
+        # load weights into new model
+        load_combined_model.load_weights("./model_output/load_model/combined_model.h5")
+
+        print("Model loaded from disk!")
+
+        return [load_g_model, load_d_model, load_combined_model]
+
     def sample_generation(self, num, net_g):
         for _ in range(num):
             noise = np.random.normal(size=[num, self.noise_size])
             gan_image = net_g.predict(noise)
-            cv2.imwrite('./model3_output/image/' + 'sample image' + str(_) + '.png', gan_image[_] * 127.5)
+            cv2.imwrite('./model_output/image/' + 'sample image' + str(_) + '.png', gan_image[_] * 127.5)
 
         print("generated image")
+
+    def save_model(self):
+        self.net_g.save_weights("./model_output/save_model/g_model.h5")
+        self.net_d.save_weights("./model_output/save_model/d_model.h5")
+        self.combined_model.save_weights("./model_output/save_model/combined_model.h5")
+
+        g_model_json = self.net_g.to_json()
+        with open("./model_output/save_model/g_model.json", "w") as json_file:
+            json_file.write(g_model_json)
+
+        d_model_json = self.net_d.to_json()
+        with open("./model_output/save_model/d_model.json", "w") as json_file:
+            json_file.write(d_model_json)
+
+        combined_model_json = self.combined_model.to_json()
+        with open("./model_output/save_model/combined_model.json", "w") as json_file:
+            json_file.write(combined_model_json)
+
+        print("Model saved to disk!")
 
     def train(self):
         i = 0
@@ -169,10 +221,45 @@ class MyoGAN:
 
             if i % 500 == 0:
                 gan_image = self.net_g.predict(np.random.normal(size=[self.batch_size, self.noise_size]))
-                print("gan image2 : ", gan_image[0].shape)
-                cv2.imwrite('./model3_output/image/' + 'fake_image' + str(i) + '.png', gan_image[0] * 127.5)
+                print("GAN Image 2: ", gan_image[0].shape)
+                cv2.imwrite('./model_output/image/' + 'fake_image' + str(i) + '.png', gan_image[0] * 127.5)
                 # cv2.imwrite('./output_image3/' + 'real_image'+ str(i) + '.png', images[0] * 127.5)
 
             i += 1
 
         self.sample_generation(32, self.net_g)
+
+    def show_history(self):
+        plt.figure(1, figsize=(16, 8))
+        plt.plot(self.d_loss_real_history)
+        plt.ylabel('d_loss_real')
+        plt.xlabel('epoch')
+        plt.legend(['train'], loc='upper left')
+
+        plt.savefig('./model3_output/image/d_loss_real_history.png')
+
+        plt.figure(2, figsize=(16, 8))
+        plt.plot(self.d_loss_fake_history)
+        plt.ylabel('d_loss_fake')
+        plt.xlabel('epoch')
+        plt.legend(['train'], loc='upper left')
+
+        plt.savefig('./model3_output/image/d_loss_fake_history.png')
+
+        # plt.show()
+
+        plt.figure(3, figsize=(16, 8))
+        plt.plot(self.g_loss_history)
+        plt.ylabel('g_loss')
+        plt.xlabel('epoch')
+        plt.legend(['train'], loc='upper left')
+
+        plt.savefig('./model3_output/image/g_loss_history.png')
+
+        # plt.show()
+
+if __name__ == '__main__':
+    myo_gan = MyoGAN()
+    myo_gan.train()
+
+    print("Finish!")
