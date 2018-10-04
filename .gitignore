@@ -6,3 +6,6 @@
 .idea/vcs.xml
 .idea/workspace.xml
 src/dataset_2018_05_16/*
+.idea/inspectionProfiles/Project_Default.xml
+src/__pycache__/load_data.cpython-36.pyc
+.idea/inspectionProfiles/Project_Default.xml
