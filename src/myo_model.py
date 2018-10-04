@@ -4,6 +4,7 @@ from keras.models import Sequential, Model
 from keras.layers import Conv2D, Conv2DTranspose, Reshape, BatchNormalization, Dense, Activation, UpSampling2D, Input
 from keras.layers import Flatten
 from keras.layers.advanced_activations import LeakyReLU
+from keras.optimizers import Adam
 from load_data import DataLoader_Continous
 from keras.models import model_from_json
 
@@ -66,12 +67,20 @@ class MyoGAN:
         combined_output = self.net_d(fake_image)
         self.combined_model = Model(inputs=[self.noise_input], outputs=[combined_output], name='combined')
 
+        adam = Adam(lr=0.0002, beta_1=0.5, beta_2=0.999)
+        self.net_g.compile(loss='binary_crossentropy', optimizer=adam)
+        self.net_d.compile(loss='binary_crossentropy', optimizer=adam)
+        self.net_d.trainable = False
+        self.combined_model.compile(loss='binary_crossentropy', optimizer=adam)
+
+        self.combined_model.summary()
+
     def generative(self):
         # TODO: Fix Error: Layer batch_normalization_6 was called with an input that isn't a symbolic tensor.
         # Received type: <class 'keras.layers.core.Dense'>. Full input: [<keras.layers.core.Dense
         # object at 0x00000238085AF0B8>]. All inputs to the layer should be tensors.
 
-        _ = Dense(256, input_shape=(100,), activation='relu')
+        _ = Dense(256, input_shape=(100,), activation='relu')(self.noise_input)
         _ = BatchNormalization(axis=1)(_, training=1)
         _ = Reshape((16, 16, 1), input_shape=(256,))(_)
 
