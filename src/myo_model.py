@@ -1,14 +1,13 @@
-import numpy as np
 import cv2
-from keras.models import Sequential, Model
-from keras.layers import Conv2D, Conv2DTranspose, Reshape, BatchNormalization, Dense, Activation, UpSampling2D, Input
+import matplotlib.pyplot as plt
+import numpy as np
+from keras.layers import Conv2D, Reshape, BatchNormalization, Dense, Activation, UpSampling2D, Input
 from keras.layers import Flatten
 from keras.layers.advanced_activations import LeakyReLU
+from keras.models import Model
+from keras.models import model_from_json
 from keras.optimizers import Adam
 from load_data import DataLoader_Continous
-from keras.models import model_from_json
-
-import matplotlib.pyplot as plt
 
 '''
 Model structure
@@ -33,6 +32,7 @@ Discriminator
 
 * Referenced from jigeria's code
 '''
+
 
 # TODO: 1. Conditional GAN
 # TODO: 2. LSTM Input (EMG vs Noise)
@@ -76,10 +76,6 @@ class MyoGAN:
         self.combined_model.summary()
 
     def generative(self):
-        # TODO: Fix Error: Layer batch_normalization_6 was called with an input that isn't a symbolic tensor.
-        # Received type: <class 'keras.layers.core.Dense'>. Full input: [<keras.layers.core.Dense
-        # object at 0x00000238085AF0B8>]. All inputs to the layer should be tensors.
-
         _ = Dense(256, input_shape=(100,), activation='relu')(self.noise_input)
         _ = BatchNormalization(axis=1)(_, training=1)
         _ = Reshape((16, 16, 1), input_shape=(256,))(_)
@@ -266,6 +262,7 @@ class MyoGAN:
         plt.savefig('./model3_output/image/g_loss_history.png')
 
         # plt.show()
+
 
 if __name__ == '__main__':
     myo_gan = MyoGAN()
