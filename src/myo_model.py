@@ -75,33 +75,58 @@ class MyoGAN:
 
         self.combined_model.summary()
 
+    # def generative(self):
+    #     _ = Dense(256, input_shape=(100,), activation='relu')(self.noise_input)
+    #     _ = BatchNormalization(axis=1)(_, training=1)
+    #     _ = Reshape((16, 16, 1), input_shape=(256,))(_)
+    #
+    #     _ = Conv2D(filters=128, kernel_size=(3, 3), strides=1, padding='same', input_shape=(16, 16, 1))(
+    #         _)
+    #     _ = BatchNormalization(axis=1)(_, training=1)
+    #     _ = Activation(activation='relu')(_)
+    #
+    #     _ = UpSampling2D()(_)
+    #     _ = Conv2D(filters=256, kernel_size=3, padding='same', input_shape=(16, 16, 128))(_)
+    #     _ = BatchNormalization(axis=1)(_, training=1)
+    #     _ = Activation(activation='relu')(_)
+    #
+    #     _ = UpSampling2D()(_)
+    #     _ = Conv2D(filters=512, kernel_size=3, padding='same', input_shape=(32, 32, 256))(_)
+    #     _ = BatchNormalization(axis=1)(_, training=1)
+    #     _ = Activation(activation='relu')(_)
+    #
+    #     _ = UpSampling2D()(_)
+    #     _ = Conv2D(filters=256, kernel_size=3, padding='same', input_shape=(64, 64, 512))(_)
+    #     _ = BatchNormalization(axis=1)(_, training=1)
+    #     _ = Activation(activation='relu')(_)
+    #
+    #     # _ = UpSampling2D()(_)
+    #     _ = Conv2D(filters=1, kernel_size=3, padding='same', input_shape=(128, 128, 256))(_)
+    #     _ = Activation(activation='tanh')(_)
+    #
+    #     return Model(inputs=self.noise_input, outputs=_)
+
     def generative(self):
-        _ = Dense(256, input_shape=(100,), activation='relu')(self.noise_input)
-        _ = BatchNormalization(axis=1)(_, training=1)
+        _ = Dense(256, input_shape=(100,), activation='elu')(self.noise_input)
         _ = Reshape((16, 16, 1), input_shape=(256,))(_)
 
-        _ = Conv2D(filters=128, kernel_size=(3, 3), strides=1, padding='same', input_shape=(16, 16, 1))(
-            _)
-        _ = BatchNormalization(axis=1)(_, training=1)
-        _ = Activation(activation='relu')(_)
+        _ = Conv2D(filters=128, kernel_size=(3, 3), strides=1, padding='same', input_shape=(16, 16, 1))(_)
+        _ = Activation(activation='elu')(_)
 
         _ = UpSampling2D()(_)
-        _ = Conv2D(filters=256, kernel_size=3, padding='same', input_shape=(16, 16, 128))(_)
-        _ = BatchNormalization(axis=1)(_, training=1)
-        _ = Activation(activation='relu')(_)
+        _ = Conv2D(filters=256, kernel_size=(3, 3), strides=1, padding='same', input_shape=(16, 16, 128))(_)
+        _ = Activation(activation='elu')(_)
 
         _ = UpSampling2D()(_)
-        _ = Conv2D(filters=512, kernel_size=3, padding='same', input_shape=(32, 32, 256))(_)
-        _ = BatchNormalization(axis=1)(_, training=1)
-        _ = Activation(activation='relu')(_)
+        _ = Conv2D(filters=512, kernel_size=(3, 3), strides=1, padding='same', input_shape=(32, 32, 256))(_)
+        _ = Activation(activation='elu')(_)
 
         _ = UpSampling2D()(_)
-        _ = Conv2D(filters=256, kernel_size=3, padding='same', input_shape=(64, 64, 512))(_)
-        _ = BatchNormalization(axis=1)(_, training=1)
-        _ = Activation(activation='relu')(_)
+        _ = Conv2D(filters=256, kernel_size=(3, 3), strides=1, padding='same', input_shape=(64, 64, 512))(_)
+        _ = Activation(activation='elu')(_)
 
         # _ = UpSampling2D()(_)
-        _ = Conv2D(filters=1, kernel_size=3, padding='same', input_shape=(128, 128, 256))(_)
+        _ = Conv2D(filters=1, kernel_size=(3, 3), strides=1, padding='same', input_shape=(128, 128, 256))(_)
         _ = Activation(activation='tanh')(_)
 
         return Model(inputs=self.noise_input, outputs=_)
