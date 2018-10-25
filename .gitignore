@@ -163,3 +163,10 @@ venv.bak/
 .mypy_cache/
 .dmypy.json
 dmypy.json
+
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+settings.json
