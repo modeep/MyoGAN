@@ -45,8 +45,8 @@ class MyoGAN:
         self.d_loss_real_history = []
         self.d_loss_fake_history = []
 
-        self.d_step = 1
-        self.g_step = 2
+        self.d_step = 100
+        self.g_step = 20
         self.epoch = 30000
         self.batch_size = 64
         self.noise_size = 100
