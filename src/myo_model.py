@@ -250,7 +250,7 @@ class MyoGAN:
             # print("%d [D loss real: %f] [D loss fake: %f] [D loss: %f] [G loss: %f]" % (
             #     i, self.d_loss_real_history[-1], self.d_loss_fake_history[-1], self.d_loss, self.g_loss_history[-1]))
 
-            if i % 500 == 0:
+            if i % 5 == 0:
                 gan_image = self.net_g.predict(np.random.normal(size=[self.batch_size, self.noise_size]))
                 print("GAN Image 2: ", gan_image[0].shape)
                 cv2.imwrite('./model_output/image/' + 'fake_image' + str(i) + '.png', gan_image[0] * 127.5)
