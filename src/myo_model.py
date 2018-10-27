@@ -127,7 +127,8 @@ class MyoGAN:
 
         # _ = UpSampling2D()(_)
         _ = Conv2D(filters=1, kernel_size=(3, 3), strides=1, padding='same', input_shape=(128, 128, 256))(_)
-        _ = Activation(activation='tanh')(_)
+        # _ = Activation(activation='tanh')(_)
+        _ = Activation(activation='sigmoid')
 
         return Model(inputs=self.noise_input, outputs=_)
 
