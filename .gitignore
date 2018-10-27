@@ -12,3 +12,4 @@ src/dataset_2018_05_16/*
 src/__pycache__/load_data.cpython-36.pyc
 .idea/inspectionProfiles/Project_Default.xml
 src/model_output
+*.zip
