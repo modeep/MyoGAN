@@ -45,8 +45,8 @@ class MyoGAN:
         self.d_loss_real_history = []
         self.d_loss_fake_history = []
 
-        self.d_step = 1
-        self.g_step = 2
+        self.d_step = 100
+        self.g_step = 20
         self.epoch = 30000
         self.batch_size = 64
         self.noise_size = 100
@@ -127,7 +127,8 @@ class MyoGAN:
 
         # _ = UpSampling2D()(_)
         _ = Conv2D(filters=1, kernel_size=(3, 3), strides=1, padding='same', input_shape=(128, 128, 256))(_)
-        _ = Activation(activation='tanh')(_)
+        # _ = Activation(activation='tanh')(_)
+        _ = Activation(activation='sigmoid')(_)
 
         return Model(inputs=self.noise_input, outputs=_)
 
@@ -249,7 +250,7 @@ class MyoGAN:
             # print("%d [D loss real: %f] [D loss fake: %f] [D loss: %f] [G loss: %f]" % (
             #     i, self.d_loss_real_history[-1], self.d_loss_fake_history[-1], self.d_loss, self.g_loss_history[-1]))
 
-            if i % 500 == 0:
+            if i % 5 == 0:
                 gan_image = self.net_g.predict(np.random.normal(size=[self.batch_size, self.noise_size]))
                 print("GAN Image 2: ", gan_image[0].shape)
                 cv2.imwrite('./model_output/image/' + 'fake_image' + str(i) + '.png', gan_image[0] * 127.5)
