@@ -7,6 +7,7 @@ from keras.layers.advanced_activations import LeakyReLU
 from keras.models import Model
 from keras.models import model_from_json
 from keras.optimizers import Adam
+from keras.utils.training_utils import multi_gpu_model
 from load_data import DataLoader_Continous
 
 '''
@@ -61,7 +62,9 @@ class MyoGAN:
                                            is_flatten=False)
 
         self.net_d = self.discriminative()
+        self.net_d = multi_gpu_model(self.net_d, gpus=2)
         self.net_g = self.generative()
+        self.net_g = multi_gpu_model(self.net_g, gpus=2)
         fake_image = self.net_g(self.noise_input)
 
         combined_output = self.net_d(fake_image)
