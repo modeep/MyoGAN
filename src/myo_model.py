@@ -69,6 +69,7 @@ class MyoGAN:
 
         combined_output = self.net_d(fake_image)
         self.combined_model = Model(inputs=[self.noise_input], outputs=[combined_output], name='combined')
+        self.combined_model = multi_gpu_model(self.combined_model, gpus=2)
 
         adam = Adam(lr=0.0002, beta_1=0.9, beta_2=0.999)
         self.net_g.compile(loss='binary_crossentropy', optimizer=adam)
