@@ -70,7 +70,7 @@ class MyoGAN:
         combined_output = self.net_d(fake_image)
         self.combined_model = Model(inputs=[self.noise_input], outputs=[combined_output], name='combined')
 
-        adam = Adam(lr=0.0002, beta_1=0.5, beta_2=0.999)
+        adam = Adam(lr=0.0002, beta_1=0.9, beta_2=0.999)
         self.net_g.compile(loss='binary_crossentropy', optimizer=adam)
         self.net_d.compile(loss='binary_crossentropy', optimizer=adam)
         self.net_d.trainable = False
