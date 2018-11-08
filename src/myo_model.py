@@ -47,8 +47,8 @@ class MyoGAN:
         self.d_loss_fake_history = []
 
         self.d_step = 100
-        self.g_step = 20
-        self.epoch = 30000
+        self.g_step = 10
+        self.epoch = 5000
         self.batch_size = 64
         self.noise_size = 100
         self.noise_input = Input(shape=(self.noise_size,))
@@ -259,6 +259,9 @@ class MyoGAN:
                 print("GAN Image 2: ", gan_image[0].shape)
                 cv2.imwrite('./model_output/image/' + 'fake_image' + str(i) + '.png', gan_image[0] * 127.5)
                 # cv2.imwrite('./output_image3/' + 'real_image'+ str(i) + '.png', images[0] * 127.5)
+
+            if i % 100 == 0:
+                self.save_model()
 
             i += 1
 
