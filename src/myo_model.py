@@ -72,69 +72,70 @@ class MyoGAN:
         self.combined_model = multi_gpu_model(self.combined_model, gpus=2)
 
         adam = Adam(lr=0.0002, beta_1=0.9, beta_2=0.999)
-        self.net_g.compile(loss='binary_crossentropy', optimizer=adam)
-        self.net_d.compile(loss='binary_crossentropy', optimizer=adam)
+        self.net_g.compile(loss='mse', optimizer=adam)
+        self.net_d.compile(loss='mse', optimizer=adam)
         self.net_d.trainable = False
-        self.combined_model.compile(loss='binary_crossentropy', optimizer=adam)
+        self.combined_model.compile(loss='mse', optimizer=adam)
 
         self.combined_model.summary()
 
-    # def generative(self):
-    #     _ = Dense(256, input_shape=(100,), activation='relu')(self.noise_input)
-    #     _ = BatchNormalization(axis=1)(_, training=1)
-    #     _ = Reshape((16, 16, 1), input_shape=(256,))(_)
-    #
-    #     _ = Conv2D(filters=128, kernel_size=(3, 3), strides=1, padding='same', input_shape=(16, 16, 1))(
-    #         _)
-    #     _ = BatchNormalization(axis=1)(_, training=1)
-    #     _ = Activation(activation='relu')(_)
-    #
-    #     _ = UpSampling2D()(_)
-    #     _ = Conv2D(filters=256, kernel_size=3, padding='same', input_shape=(16, 16, 128))(_)
-    #     _ = BatchNormalization(axis=1)(_, training=1)
-    #     _ = Activation(activation='relu')(_)
-    #
-    #     _ = UpSampling2D()(_)
-    #     _ = Conv2D(filters=512, kernel_size=3, padding='same', input_shape=(32, 32, 256))(_)
-    #     _ = BatchNormalization(axis=1)(_, training=1)
-    #     _ = Activation(activation='relu')(_)
-    #
-    #     _ = UpSampling2D()(_)
-    #     _ = Conv2D(filters=256, kernel_size=3, padding='same', input_shape=(64, 64, 512))(_)
-    #     _ = BatchNormalization(axis=1)(_, training=1)
-    #     _ = Activation(activation='relu')(_)
-    #
-    #     # _ = UpSampling2D()(_)
-    #     _ = Conv2D(filters=1, kernel_size=3, padding='same', input_shape=(128, 128, 256))(_)
-    #     _ = Activation(activation='tanh')(_)
-    #
-    #     return Model(inputs=self.noise_input, outputs=_)
-
     def generative(self):
-        _ = Dense(256, input_shape=(100,), activation='elu')(self.noise_input)
+        _ = Dense(256, input_shape=(100,))(self.noise_input)
+        _ = BatchNormalization(axis=1)(_, training=1)
+        _ = LeakyReLU(alpha=0.2)(_)
         _ = Reshape((16, 16, 1), input_shape=(256,))(_)
 
-        _ = Conv2D(filters=128, kernel_size=(3, 3), strides=1, padding='same', input_shape=(16, 16, 1))(_)
-        _ = Activation(activation='elu')(_)
+        _ = Conv2D(filters=128, kernel_size=(3, 3), strides=1, padding='same', input_shape=(16, 16, 1))(
+            _)
+        _ = BatchNormalization(axis=1)(_, training=1)
+        _ = LeakyReLU(alpha=0.2)(_)
 
         _ = UpSampling2D()(_)
-        _ = Conv2D(filters=256, kernel_size=(3, 3), strides=1, padding='same', input_shape=(16, 16, 128))(_)
-        _ = Activation(activation='elu')(_)
+        _ = Conv2D(filters=256, kernel_size=3, padding='same', input_shape=(16, 16, 128))(_)
+        _ = BatchNormalization(axis=1)(_, training=1)
+        _ = LeakyReLU(alpha=0.2)(_)
 
         _ = UpSampling2D()(_)
-        _ = Conv2D(filters=512, kernel_size=(3, 3), strides=1, padding='same', input_shape=(32, 32, 256))(_)
-        _ = Activation(activation='elu')(_)
+        _ = Conv2D(filters=512, kernel_size=3, padding='same', input_shape=(32, 32, 256))(_)
+        _ = BatchNormalization(axis=1)(_, training=1)
+        _ = LeakyReLU(alpha=0.2)(_)
 
         _ = UpSampling2D()(_)
-        _ = Conv2D(filters=256, kernel_size=(3, 3), strides=1, padding='same', input_shape=(64, 64, 512))(_)
-        _ = Activation(activation='elu')(_)
+        _ = Conv2D(filters=256, kernel_size=3, padding='same', input_shape=(64, 64, 512))(_)
+        _ = BatchNormalization(axis=1)(_, training=1)
+        _ = LeakyReLU(alpha=0.2)(_)
 
         # _ = UpSampling2D()(_)
-        _ = Conv2D(filters=1, kernel_size=(3, 3), strides=1, padding='same', input_shape=(128, 128, 256))(_)
-        # _ = Activation(activation='tanh')(_)
-        _ = Activation(activation='sigmoid')(_)
+        _ = Conv2D(filters=1, kernel_size=3, padding='same', input_shape=(128, 128, 256))(_)
+        _ = Activation(activation='tanh')(_)
 
         return Model(inputs=self.noise_input, outputs=_)
+
+    # def generative(self):
+    #     _ = Dense(256, input_shape=(100,), activation='elu')(self.noise_input)
+    #     _ = Reshape((16, 16, 1), input_shape=(256,))(_)
+    #
+    #     _ = Conv2D(filters=128, kernel_size=(3, 3), strides=1, padding='same', input_shape=(16, 16, 1))(_)
+    #     _ = Activation(activation='elu')(_)
+    #
+    #     _ = UpSampling2D()(_)
+    #     _ = Conv2D(filters=256, kernel_size=(3, 3), strides=1, padding='same', input_shape=(16, 16, 128))(_)
+    #     _ = Activation(activation='elu')(_)
+    #
+    #     _ = UpSampling2D()(_)
+    #     _ = Conv2D(filters=512, kernel_size=(3, 3), strides=1, padding='same', input_shape=(32, 32, 256))(_)
+    #     _ = Activation(activation='elu')(_)
+    #
+    #     _ = UpSampling2D()(_)
+    #     _ = Conv2D(filters=256, kernel_size=(3, 3), strides=1, padding='same', input_shape=(64, 64, 512))(_)
+    #     _ = Activation(activation='elu')(_)
+    #
+    #     # _ = UpSampling2D()(_)
+    #     _ = Conv2D(filters=1, kernel_size=(3, 3), strides=1, padding='same', input_shape=(128, 128, 256))(_)
+    #     # _ = Activation(activation='tanh')(_)
+    #     _ = Activation(activation='sigmoid')(_)
+    #
+    #     return Model(inputs=self.noise_input, outputs=_)
 
     def discriminative(self):
         _ = inputs = Input(shape=(self.image_size, self.image_size, self.image_channel))
@@ -161,10 +162,10 @@ class MyoGAN:
         _ = BatchNormalization(axis=1)(_, training=1)
         _ = Conv2D(filters=self.image_channel, kernel_size=(2, 2), strides=1, padding='same', input_shape=(4, 4, 128))(
             _)
-        # _ = LeakyReLU(alpha=0.2)(_)
+        _ = LeakyReLU(alpha=0.2)(_)
 
         outputs = Flatten()(_)
-        outputs = Dense(1, activation='sigmoid')(outputs)
+        outputs = Dense(1)(outputs)
 
         return Model(inputs=inputs, outputs=outputs)
 
