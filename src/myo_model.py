@@ -7,7 +7,7 @@ from keras.layers.advanced_activations import LeakyReLU
 from keras.models import Model
 from keras.models import model_from_json
 from keras.optimizers import Adam
-from keras.utils.training_utils import multi_gpu_model
+from keras.utils import multi_gpu_model
 from load_data import DataLoader_Continous
 
 '''
