@@ -81,8 +81,6 @@ class MyoLSGAN():
     def build_discriminator(self):
         model = Sequential()
 
-        model.add(Input(shape=(self.img_rows, self.img_cols, self.channels)))
-
         model.add(Conv2D(filters=256, kernel_size=(2, 2), strides=2, padding='same', input_shape=(128, 128, 1)))
         model.add(LeakyReLU(alpha=0.2))
 
