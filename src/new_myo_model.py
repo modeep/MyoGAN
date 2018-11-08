@@ -11,8 +11,8 @@ from load_data import DataLoader_Continous
 
 class MyoLSGAN():
     def __init__(self):
-        self.img_rows = 256
-        self.img_cols = 256
+        self.img_rows = 128
+        self.img_cols = 128
         self.channels = 1
         self.img_shape = (self.img_rows, self.img_cols, self.channels)
         self.latent_dim = 100
@@ -80,6 +80,8 @@ class MyoLSGAN():
 
     def build_discriminator(self):
         model = Sequential()
+
+        model.add(Input(shape=(self.img_rows, self.img_cols, self.channels)))
 
         model.add(Conv2D(filters=256, kernel_size=(2, 2), strides=2, padding='same', input_shape=(128, 128, 1)))
         model.add(LeakyReLU(alpha=0.2))
