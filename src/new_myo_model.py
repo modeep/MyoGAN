@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from keras.layers import BatchNormalization, Activation
 from keras.layers import Conv2D, UpSampling2D
-from keras.layers import Input, Dense, Reshape
+from keras.layers import Input, Dense, Reshape, Flatten
 from keras.layers.advanced_activations import LeakyReLU
 from keras.models import Sequential, Model
 from keras.optimizers import Adam
@@ -11,11 +11,10 @@ from load_data import DataLoader_Continous
 
 class MyoLSGAN():
     def __init__(self):
-        self.img_rows = 128
-        self.img_cols = 128
+        self.img_size = 128
         self.channels = 1
-        self.img_shape = (self.img_rows, self.img_cols, self.channels)
-        self.latent_dim = 100
+        self.img_shape = (self.img_size, self.img_size, self.channels)
+        self.noise_size = 100
         self.d_step = 100
         self.g_step = 10
         self.g_loss_history = []
@@ -35,7 +34,7 @@ class MyoLSGAN():
 
         self.generator = self.build_generator()
 
-        z = Input(shape=(self.latent_dim,))
+        z = Input(shape=(self.noise_size,))
         img = self.generator(z)
 
         self.discriminator.trainable = False
@@ -46,62 +45,85 @@ class MyoLSGAN():
         self.combined.compile(loss='mse', optimizer=optimizer)
 
     def build_generator(self):
+        # model = Sequential()
+        #
+        # model.add(Dense(256, input_shape=(100,), activation='elu'))
+        #
+        # model.add(Reshape((16, 16, 1), input_shape=(256,)))
+        #
+        # model.add(Conv2D(filters=128, kernel_size=(3, 3), strides=1, padding='same', input_shape=(16, 16, 1)))
+        # model.add(Activation(activation='elu'))
+        #
+        # model.add(UpSampling2D())
+        # model.add(Conv2D(filters=256, kernel_size=(3, 3), strides=1, padding='same', input_shape=(16, 16, 128)))
+        # model.add(Activation(activation='elu'))
+        #
+        # model.add(UpSampling2D())
+        # model.add(Conv2D(filters=512, kernel_size=(3, 3), strides=1, padding='same', input_shape=(32, 32, 256)))
+        # model.add(Activation(activation='elu'))
+        #
+        # model.add(UpSampling2D())
+        # model.add(Conv2D(filters=256, kernel_size=(3, 3), strides=1, padding='same', input_shape=(64, 64, 512)))
+        # model.add(Activation(activation='elu'))
+        #
+        # # _ = UpSampling2D()(_)
+        # model.add(Conv2D(filters=1, kernel_size=(3, 3), strides=1, padding='same', input_shape=(128, 128, 256)))
+        # # _ = Activation(activation='tanh')(_)
+        # model.add(Activation(activation='tanh'))
+
         model = Sequential()
 
-        model.add(Dense(256, input_shape=(100,), activation='elu'))
-        model.add(Reshape((16, 16, 1), input_shape=(256,)))
-
-        model.add(Conv2D(filters=128, kernel_size=(3, 3), strides=1, padding='same', input_shape=(16, 16, 1)))
-        model.add(Activation(activation='elu'))
-
-        model.add(UpSampling2D())
-        model.add(Conv2D(filters=256, kernel_size=(3, 3), strides=1, padding='same', input_shape=(16, 16, 128)))
-        model.add(Activation(activation='elu'))
-
-        model.add(UpSampling2D())
-        model.add(Conv2D(filters=512, kernel_size=(3, 3), strides=1, padding='same', input_shape=(32, 32, 256)))
-        model.add(Activation(activation='elu'))
-
-        model.add(UpSampling2D())
-        model.add(Conv2D(filters=256, kernel_size=(3, 3), strides=1, padding='same', input_shape=(64, 64, 512)))
-        model.add(Activation(activation='elu'))
-
-        # _ = UpSampling2D()(_)
-        model.add(Conv2D(filters=1, kernel_size=(3, 3), strides=1, padding='same', input_shape=(128, 128, 256)))
-        # _ = Activation(activation='tanh')(_)
-        model.add(Activation(activation='tanh'))
+        model.add(Dense(256, input_shape=self.noise_size))
+        model.add(LeakyReLU(alpha=0.2))
+        model.add(BatchNormalization())
+        model.add(Dense(512))
+        model.add(LeakyReLU(alpha=0.2))
+        model.add(BatchNormalization())
+        model.add(Dense(1024))
+        model.add(LeakyReLU(alpha=0.2))
+        model.add(BatchNormalization())
+        model.add(Dense(np.prod(self.img_shape), activation='tanh'))
+        model.add(Reshape(self.img_shape))
 
         model.summary()
 
-        noise = Input(shape=(self.latent_dim,))
+        noise = Input(shape=(self.noise_size,))
         img = model(noise)
 
         return Model(noise, img)
 
     def build_discriminator(self):
+        # model = Sequential()
+        #
+        # model.add(Conv2D(filters=256, kernel_size=(2, 2), strides=2, padding='same', input_shape=(128, 128, 1)))
+        # model.add(LeakyReLU(alpha=0.2))
+        #
+        # model.add(BatchNormalization(axis=1))
+        # model.add(Conv2D(filters=512, kernel_size=(1, 1), strides=2, padding='same', input_shape=(64, 64, 256)))
+        # model.add(LeakyReLU(alpha=0.2))
+        #
+        # model.add(BatchNormalization(axis=1))
+        # model.add(Conv2D(filters=256, kernel_size=(2, 2), strides=2, padding='same', input_shape=(32, 32, 512)))
+        # model.add(LeakyReLU(alpha=0.2))
+        #
+        # model.add(BatchNormalization(axis=1))
+        # model.add(Conv2D(filters=128, kernel_size=(2, 2), strides=2, padding='same', input_shape=(16, 16, 256)))
+        # model.add(LeakyReLU(alpha=0.2))
+        #
+        # model.add(BatchNormalization(axis=1))
+        # model.add(Conv2D(filters=128, kernel_size=(2, 2), strides=2, padding='same', input_shape=(8, 8, 128)))
+        # model.add(LeakyReLU(alpha=0.2))
+        #
+        # model.add(BatchNormalization(axis=1))
+        # model.add(Conv2D(filters=self.channels, kernel_size=(2, 2), strides=1, padding='same', input_shape=(4, 4, 128)))
+
         model = Sequential()
-
-        model.add(Conv2D(filters=256, kernel_size=(2, 2), strides=2, padding='same', input_shape=(128, 128, 1)))
+        model.add(Flatten(input_shape=self.img_shape))
+        model.add(Dense(512))
         model.add(LeakyReLU(alpha=0.2))
-
-        model.add(BatchNormalization(axis=1))
-        model.add(Conv2D(filters=512, kernel_size=(1, 1), strides=2, padding='same', input_shape=(64, 64, 256)))
+        model.add(Dense(256))
         model.add(LeakyReLU(alpha=0.2))
-
-        model.add(BatchNormalization(axis=1))
-        model.add(Conv2D(filters=256, kernel_size=(2, 2), strides=2, padding='same', input_shape=(32, 32, 512)))
-        model.add(LeakyReLU(alpha=0.2))
-
-        model.add(BatchNormalization(axis=1))
-        model.add(Conv2D(filters=128, kernel_size=(2, 2), strides=2, padding='same', input_shape=(16, 16, 256)))
-        model.add(LeakyReLU(alpha=0.2))
-
-        model.add(BatchNormalization(axis=1))
-        model.add(Conv2D(filters=128, kernel_size=(2, 2), strides=2, padding='same', input_shape=(8, 8, 128)))
-        model.add(LeakyReLU(alpha=0.2))
-
-        model.add(BatchNormalization(axis=1))
-        model.add(Conv2D(filters=self.channels, kernel_size=(2, 2), strides=1, padding='same', input_shape=(4, 4, 128)))
+        model.add(Dense(1))
 
         model.summary()
 
@@ -118,7 +140,7 @@ class MyoLSGAN():
             images = self.loader.get_images(batch_size)
 
             for _ in range(self.d_step):
-                noise = np.random.normal(0, 1, (batch_size, self.latent_dim))
+                noise = np.random.normal(0, 1, (batch_size, self.noise_size))
                 g_z = self.generator.predict(noise)
 
                 d_loss_real = self.discriminator.train_on_batch(images, valid)
@@ -130,7 +152,7 @@ class MyoLSGAN():
                 self.d_loss_history.append(d_loss)
 
             for _ in range(self.g_step):
-                noise = np.random.normal(0, 1, (batch_size, self.latent_dim))
+                noise = np.random.normal(0, 1, (batch_size, self.noise_size))
                 g_loss = self.combined.train_on_batch(noise, valid)
                 self.g_loss_history.append(g_loss)
 
@@ -142,8 +164,8 @@ class MyoLSGAN():
                 self.sample_images(epoch)
 
     def sample_images(self, epoch):
-        r, c = 5, 5
-        noise = np.random.normal(0, 1, (r * c, self.latent_dim))
+        r, c = 10, 10
+        noise = np.random.normal(0, 1, (r * c, self.noise_size))
         gen_imgs = self.generator.predict(noise)
 
         gen_imgs = 0.5 * gen_imgs + 0.5
