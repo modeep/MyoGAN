@@ -15,7 +15,7 @@ class MyoLSGAN():
         self.channels = 1
         self.img_shape = (self.img_size, self.img_size, self.channels)
         self.noise_size = 100
-        self.d_step = 100
+        self.d_step = 50
         self.g_step = 10
         self.g_loss_history = []
         self.d_loss_real_history = []
