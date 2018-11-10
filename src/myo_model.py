@@ -256,10 +256,12 @@ class MyoGAN:
             #     i, self.d_loss_real_history[-1], self.d_loss_fake_history[-1], self.d_loss, self.g_loss_history[-1]))
 
             if i % 5 == 0:
-                gan_image = self.net_g.predict(np.random.normal(size=[self.batch_size, self.noise_size]))
-                print("GAN Image 2: ", gan_image[0].shape)
-                cv2.imwrite('./model_output/image/' + 'fake_image' + str(i) + '.png', gan_image[0] * 127.5)
+                # gan_image = self.net_g.predict(np.random.normal(size=[self.batch_size, self.noise_size]))
+                # print("GAN Image 2: ", gan_image[0].shape)
+                # cv2.imwrite('./model_output/image/' + 'fake_image' + str(i) + '.png', gan_image[0] * 127.5)
                 # cv2.imwrite('./output_image3/' + 'real_image'+ str(i) + '.png', images[0] * 127.5)
+                print("Epoch {0}: Saved Output Image.".format(i))
+                self.epoch_images(i)
 
             if i % 100 == 0:
                 self.save_model()
@@ -267,6 +269,23 @@ class MyoGAN:
             i += 1
 
         self.sample_generation(32, self.net_g)
+
+    def epoch_images(self, epoch):
+        r, c = 5, 5
+        noise = np.random.normal(0, 1, (r * c, self.noise_size))
+        gen_imgs = self.net_g.predict(noise)
+
+        gen_imgs = 0.5 * gen_imgs + 0.5
+
+        fig, axs = plt.subplots(r, c)
+        cnt = 0
+        for i in range(r):
+            for j in range(c):
+                axs[i, j].imshow(gen_imgs[cnt, :, :, 0], cmap='gray')
+                axs[i, j].axis('off')
+                cnt += 1
+        fig.savefig('./model_output/image/fake_image{0}.png'.format(epoch))
+        plt.close()
 
     def show_history(self):
         plt.figure(1, figsize=(16, 8))
