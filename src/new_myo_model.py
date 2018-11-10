@@ -73,7 +73,7 @@ class MyoLSGAN():
 
         model = Sequential()
 
-        model.add(Dense(256, input_shape=self.noise_size))
+        model.add(Dense(256, input_shape=(self.noise_size,)))
         model.add(LeakyReLU(alpha=0.2))
         model.add(BatchNormalization())
         model.add(Dense(512))
