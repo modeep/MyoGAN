@@ -8,7 +8,7 @@ from keras.models import Model
 from keras.models import model_from_json
 from keras.optimizers import Adam
 from keras.utils import multi_gpu_model
-from load_data import DataLoader_Continous
+# from load_data import DataLoader_Continous
 
 '''
 Model structure
@@ -318,6 +318,17 @@ class MyoGAN:
 
 
 if __name__ == '__main__':
+    from keras.datasets import mnist
+    import tensorflow as tf
+
+    (x_train, y_train), (x_test, y_test) = mnist.load_data()
+
+    x_train = tf.image.resize_images(x_train, [128, 128])
+    y_train = tf.image.resize_images(y_train, [128, 128])
+    x_test = tf.image.resize_images(x_test, [128, 128])
+    y_test = tf.image.resize_images(y_test, [128, 128])
+
+    exit()
     myo_gan = MyoGAN()
     myo_gan.train()
 
