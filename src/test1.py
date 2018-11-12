@@ -1,11 +1,11 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from keras.datasets import mnist
-from keras.optimizers import Adam
-from keras.models import Sequential, Model
-from keras.layers import Input, Dense, Reshape, Flatten, BatchNormalization
-from keras.layers import Conv2D, UpSampling2D, Activation
-from keras.layers.advanced_activations import LeakyReLU
+from tensorflow.contrib.keras.api.keras.optimizers import Adam
+from tensorflow.contrib.keras.api.keras.models import Sequential, Model
+from tensorflow.contrib.keras.api.keras.layers import Input, Dense, Reshape, Flatten, BatchNormalization
+from tensorflow.contrib.keras.api.keras.layers import Conv2D, UpSampling2D, Activation
+from tensorflow.contrib.keras.api.keras.layers import LeakyReLU
+from tensorflow.contrib.keras.api.keras.datasets import mnist
 import tensorflow as tf
 
 
@@ -121,7 +121,15 @@ class TestGAN:
 
             # Train Discriminator
 
+            print(x_train.shape)
+            print(x_train.shape[0])
+
             idx = np.random.randint(0, x_train.shape[0], batch_size)
+
+            print(idx)
+
+            print(x_train[1])
+
             imgs = x_train[idx]
 
             noise = np.random.normal(0, 1, (batch_size, self.noise_size))
