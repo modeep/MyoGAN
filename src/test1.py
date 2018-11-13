@@ -1,11 +1,10 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from tensorflow.contrib.keras.api.keras.optimizers import Adam
-from tensorflow.contrib.keras.api.keras.models import Sequential, Model
-from tensorflow.contrib.keras.api.keras.layers import Input, Dense, Reshape, Flatten, BatchNormalization
-from tensorflow.contrib.keras.api.keras.layers import Conv2D, UpSampling2D, Activation
-from tensorflow.contrib.keras.api.keras.layers import LeakyReLU
-from tensorflow.contrib.keras.api.keras.datasets import mnist
+from keras.optimizers import Adam
+from keras.models import Sequential, Model
+from keras.layers import Input, Dense, Reshape, Flatten, BatchNormalization
+from keras.layers import Conv2D, UpSampling2D, Activation, LeakyReLU
+from keras.datasets import mnist
 import tensorflow as tf
 
 
@@ -111,8 +110,8 @@ class TestGAN:
         (x_train, _), (_, _) = mnist.load_data()
 
         x_train = (x_train.astype(np.float32) - 127.5) / 127.5
-        x_train = np.expand_dims(x_train, axis=3)
-        x_train = tf.image.resize_images(x_train, [128, 128])
+        # x_train = np.expand_dims(x_train, axis=3)
+        # x_train = tf.image.resize_images(x_train, [128, 128])
 
         valid = np.ones((batch_size, 1))
         fake = np.zeros((batch_size, 1))
@@ -126,11 +125,24 @@ class TestGAN:
 
             idx = np.random.randint(0, x_train.shape[0], batch_size)
 
+            # idx = np.expand_dims(idx, axis=0)
+
             print(idx)
 
-            print(x_train[1])
+            print(idx.shape)
+
+            print(idx.dtype)
+
+            print(x_train[1, 2])
 
             imgs = x_train[idx]
+
+            imgs = imgs.reshape((-1, imgs.shape[1], imgs.shape[1], 1))
+            imgs = tf.image.resize_images(imgs, [128, 128])
+            with tf.Session():
+                imgs = imgs.eval()
+
+            print(imgs.shape)
 
             noise = np.random.normal(0, 1, (batch_size, self.noise_size))
 
