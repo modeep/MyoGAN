@@ -2,3 +2,4 @@ src/dataset_2018_05_16/*
 *.zip
 .idea/
 src/__pycache__/load_data.cpython-36.pyc
+.1/
