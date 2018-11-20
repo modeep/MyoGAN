@@ -7,6 +7,8 @@ from keras.layers.advanced_activations import LeakyReLU
 from keras.layers.convolutional import UpSampling2D, Conv2D
 from keras.models import Sequential, Model
 from keras.optimizers import Adam
+from keras.models import load_model
+
 
 from load_data import DataLoader_Continous
 
@@ -161,6 +163,9 @@ class DCGAN():
             # If at save interval => save generated image samples
             if epoch % save_interval == 0:
                 self.save_imgs(epoch)
+
+            if epoch % 500 == 0:
+                self.generator.save('./model/DCGAN_MODEL_%d.h5' % epoch)
 
     def save_imgs(self, epoch):
         r, c = 5, 5
