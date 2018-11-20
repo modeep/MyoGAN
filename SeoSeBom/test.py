@@ -21,7 +21,7 @@ class DCGAN():
         self.img_shape = (self.img_rows, self.img_cols, self.channels)
         self.latent_dim = 100
 
-        optimizer = Adam(0.0002, 0.5)
+        optimizer = Adam(0.0001, 0.5)
         self.load_image = DataLoader_Continous('./1/', False, False, False, False)
 
         # Build and compile the discriminator
@@ -52,26 +52,30 @@ class DCGAN():
 
         model = Sequential()
 
-        model.add(Dense(128 * 32 * 32, activation="relu", input_dim=self.latent_dim))
+        model.add(Dense(128 * 32 * 32, activation="elu", input_dim=self.latent_dim))
         model.add(Reshape((32, 32, 128)))
         model.add(UpSampling2D())
         model.add(Dropout(0.25))
         model.add(Conv2D(64, kernel_size=3, padding="same"))
         model.add(BatchNormalization(momentum=0.8))
-        model.add(Activation("relu"))
+        model.add(Activation("elu"))
         model.add(Dropout(0.25))
         model.add(Conv2D(128, kernel_size=3, padding="same"))
         model.add(BatchNormalization(momentum=0.8))
-        model.add(Activation("relu"))
+        model.add(Activation("elu"))
         model.add(UpSampling2D())
         model.add(Dropout(0.25))
-        model.add(Conv2D(64, kernel_size=3, padding="same"))
+        model.add(Conv2D(128, kernel_size=3, padding="same"))
         model.add(BatchNormalization(momentum=0.8))
-        model.add(Activation("relu"))
+        model.add(Activation("elu"))
+        model.add(Dropout(0.25))
+        model.add(Conv2D(128, kernel_size=3, padding="same"))
+        model.add(BatchNormalization(momentum=0.8))
+        model.add(Activation("elu"))
         model.add(Dropout(0.25))
         model.add(Conv2D(64, kernel_size=3, padding="same"))
         model.add(BatchNormalization(momentum=0.8))
-        model.add(Activation("relu"))
+        model.add(Activation("elu"))
         model.add(Dropout(0.25))
         model.add(Conv2D(self.channels, kernel_size=3, padding="same"))
         model.add(Activation("tanh"))
@@ -103,7 +107,7 @@ class DCGAN():
         model.add(BatchNormalization(momentum=0.8))
         model.add(LeakyReLU(alpha=0.2))
         model.add(Dropout(0.25))
-        model.add(Conv2D(256, kernel_size=3, strides=1, padding="same"))
+        model.add(Conv2D(64, kernel_size=3, strides=1, padding="same"))
         model.add(BatchNormalization(momentum=0.8))
         model.add(LeakyReLU(alpha=0.2))
         model.add(Dropout(0.25))
@@ -143,7 +147,7 @@ class DCGAN():
             # Sample noise and generate a batch of new images
             noise = np.random.normal(0, 1, (batch_size, self.latent_dim))
             gen_imgs = self.generator.predict(noise)
-            print(np.shape(gen_imgs))
+            # print(np.shape(gen_imgs))
 
             # Train the discriminator (real classified as ones and generated as zeros)
             d_loss_real = self.discriminator.train_on_batch(imgs, valid)
